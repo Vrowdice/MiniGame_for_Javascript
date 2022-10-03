@@ -2,7 +2,7 @@
 <html lang='en'>
 	<head>
         <meta charset= "UTF-8">
-		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="../style.css">
         <title>Snake Game</title>
 	</head>
 	<body>
@@ -22,15 +22,20 @@
             <center>
                 <hr>
                 <center>
-                	Pleas enter the value between 10 ~ 200
+                	Horizontal, Vertical value = 5 ~ 50 <br>
+                    Game speed value = 0.1 ~ 10
                 </center>
+                <div class ="emptyDivider"></div>
                 Horizontal : 
                 <input id="inputX" class="input" value ="10">
                 
                 Vertical : 
             	<input id="inputY" class="input" value ="10">
-                
             </center>
+            
+            Game Speed : 
+            <input id="inputS" class="input" value ="1">
+            
             <div class ="container"></div>
             <center>
                 <button class ="button" onclick ="ClickMainBtn()">
