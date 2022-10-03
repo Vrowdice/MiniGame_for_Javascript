@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+        <meta charset= "UTF-8">
+		<link rel="stylesheet" href="style.css">
+        <title>Snake Game</title>
+	</head>
+	<body>
+        <div id="canvasParant" style="display:none">
+            <canvas id ="canvas" width="720" height="500"></canvas>
+        </div>
+        
+        <div id= "mainEl" class="center" style="display:block">
+            <div class ="container" style="display:"></div>
+            
+            <center style="font-size:75px; font-style:bold">
+				SNAKE GAME
+            </center>
+            <div class ="emptyDivider"></div>
+
+            <img src="Images/snake.png" width="150px">
+            <center>
+                <hr>
+                <center>
+                	Pleas enter the value between 3 ~ 200
+                </center>
+                Horizontal : 
+                <input id="inputX" class="input">
+                
+                Vertical : 
+            	<input id="inputY" class="input">
+                
+            </center>
+            <div class ="container"></div>
+            <center>
+                <button class ="button" onclick ="ClickMainBtn()">
+                    START
+                </button>
+            </center>
+        </div>
+        
+        <script src= "mainGame.js"></script>
+	</body>
+
+</html>
