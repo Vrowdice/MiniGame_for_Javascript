@@ -20,7 +20,7 @@ var gameSpeed = 0;
 
 var isGameStart = false;
 
-let map = 0;
+let map = new Array();
 
 function ClickMainBtn(){
     mapX = document.getElementById("inputX").value;
@@ -42,10 +42,7 @@ function ClickMainBtn(){
         snakeYPos = parseInt(mapY / 2);
         snakeYPos = 0;
         
-        map = new Array(mapX);
-        for (var i = 0; i < mapX; i++) {
-            map[i] = new Array(mapY);
-        }
+        map = new Array(mapX * mapY);
         map.fill(0);
         
         snakeRot = 3;
@@ -78,40 +75,33 @@ function MoveSnake(){
     }
 }
 
-function AddMap(){  
-    map.splice(snakeXPos, 1, ["1", snakeYPos]);
+function AddMap(){ 
+    SetMap(snakeXPos, snakeYPos, 1);
+    console.log(map);
     
     ctx.beginPath();
     
-    for(var i = 0; i < mapX; i++){
-    	for(var o = 0; o < mapY; o++){
-            ctx.fillRect(i * 40 + 5, o * 40 + 5, 35, 35);
-            if(map[i][o] == 1){
+    for(var i = 0; i < mapY; i++){
+    	for(var o = 0; o < mapX; o++){
+            ctx.fillRect(o * 40 + 5, i * 40 + 5, 35, 35);
+            if(GetMap(snakeXPos, snakeYPos) == 1){
                 ctx.fillStyle = "black";
-                console.log(i + " " + o)
             } else {
                 ctx.fillStyle = "#BBBBBB";
             }
-            ctx.fill();
     	}
     }
-    
-    /*
-    for(var i = 0; i < mapX; i++){
-    	for(var o = 0; o < mapY; o++){
-        	ctx.fillRect(i * 40 + 5, o * 40 + 5, 35, 35);
-            if(i == snakeXPos && o == snakeYPos - 1){
-                ctx.fillStyle = "black";
-                console.log(i + " " + o)
-            } else {
-                ctx.fillStyle = "#BBBBBB";
-            }
-    		ctx.fill();
-    	}
-    }
-    */
     
     ctx.closePath();
+}
+
+function SetMap(x, y, value){
+    map.splice(x + y * (mapX - 1), 0, value);
+    console.log(x + y * (mapX - 1));
+}
+
+function GetMap(x, y){
+    return map[x + y * (mapX - 1)];
 }
 
 window.addEventListener("keydown", e => {
