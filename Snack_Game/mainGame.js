@@ -32,6 +32,7 @@ function ClickMainBtn(){
       gameSpeed >= minSpeed && gameSpeed <= maxSpeed){
         isGameStart = true;
         
+        scrollDisable();
         canvasParant.style.display = 'block';
         mainEl.style.display = 'none';
         setInterval(MainGame, gameSpeed * 100);
@@ -76,17 +77,17 @@ function MoveSnake(){
 }
 
 function AddMap(){ 
-    SetMap(snakeXPos, snakeYPos, 1);
-    console.log(map);
+    AddSnake();
     
     ctx.beginPath();
     
     for(var i = 0; i < mapY; i++){
     	for(var o = 0; o < mapX; o++){
             ctx.fillRect(o * 40 + 5, i * 40 + 5, 35, 35);
-            if(GetMap(snakeXPos, snakeYPos) == 1){
+            if(GetMap(o, i) == 1){
                 ctx.fillStyle = "black";
             } else {
+
                 ctx.fillStyle = "#BBBBBB";
             }
     	}
@@ -95,13 +96,16 @@ function AddMap(){
     ctx.closePath();
 }
 
+function AddSnake(){
+    SetMap(snakeXPos, snakeYPos, 1);
+}
+
 function SetMap(x, y, value){
-    map.splice(x + y * (mapX - 1), 0, value);
-    console.log(x + y * (mapX - 1));
+    map.splice(x + y * mapX, 1, value);
 }
 
 function GetMap(x, y){
-    return map[x + y * (mapX - 1)];
+    return map[x + y * mapX];
 }
 
 window.addEventListener("keydown", e => {
@@ -117,3 +121,11 @@ window.addEventListener("keydown", e => {
       }
   }
 });
+
+function scrollDisable(){
+    document.getElementById("body").classname = "hidden"
+}
+
+function scrollAble(){
+    document.getElementById("body").classname = "body"
+}

@@ -2,10 +2,16 @@
     src : url("fonts/OpenSans.ttf");
     font-family: "OpenSans"
 }
+
 #canvas { 
     background: #eee;
     display: block; 
     margin: 0 auto; 
+}
+.hidden {
+    height:100%;
+    min-height:100%;
+    overflow:hidden !important;
 }
 .button {
     background-color: black;
@@ -28,8 +34,10 @@
     padding: 10px;
     margin: 30px;
 }
+
 .divider{
 }
+
 .emptyDivider{
     margin: 20px;
 }
