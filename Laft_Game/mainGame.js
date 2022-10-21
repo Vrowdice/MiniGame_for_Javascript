@@ -25,7 +25,6 @@ var nowItemTime = 0;
 var snakeRot = 0;
 var snakeXPos = 0;
 var snakeYPos = 0;
-var snakelength = 0;
 
 //now snake position
 var mapX = 0;
@@ -102,6 +101,7 @@ function GameOver(){
 //snake moving way
 function MoveSnake(){
     var afterNum = 0;
+    var beforeNum = 0;
     var tmplist = [];
     
     tmplist = snakeList;
@@ -119,21 +119,18 @@ function MoveSnake(){
 		--snakeXPos;
         afterNum = 1
     }
+    beforeNum = afterNum * -1
     
     for(var i = 0; i < tmplist.length; i++){
         map.splice(tmplist[i], 1, 0);
     }
     
-    if(map[snakeList[snakelength] - afterNum] == 2){
-        snakeList.push(snakeList[snakelength] + afterNum);
-        snakelength++
-    }
-    
-    snakeList[0] -= afterNum;
     for(var i = 0; i < snakeList.length; i++){
-        if(i >= 1){
-            snakeList[i] -= tmplist;
+        if(map[snakeList[i] - afterNum] == 2){
+            snakeList.push(snakeList[i] + beforeNum);
         }
+        
+        snakeList[i] -= afterNum ;
         map.splice(snakeList[i], 1, 1);
     }
 }
