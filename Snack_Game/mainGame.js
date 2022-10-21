@@ -3,32 +3,67 @@ const canvasParant = document.getElementById("canvasParant")
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+//max and min map size
 const maxMap = 50;
 const minMap = 5;
 
+//max and min game speed
 const maxSpeed = 10;
 const minSpeed = 0.1
 
-const maxItem = 5;
+//the time the item exists
+const itemTime = 8;
 
+//max item
+var maxItem = 5;
+
+//game time and now item exists time
 var gameTime = 0;
+var nowItemTime = 0;
 
+//snake imfo
 var snakeRot = 0;
 var snakeXPos = 0;
 var snakeYPos = 0;
-var snakeLength = 0;
 
+//now snake position
 var mapX = 0;
 var mapY = 0;
 
+//now game speed
 var gameSpeed = 0;
 
+//game start flag
 var isGameStart = false;
 
+//item0 array,
+//snake body array,
+//map array
 let item0List = [];
-let allSnake = [];
+let snakeList = [];
 let map = [];
 
+//game start main setting
+function GameStartSetting(){
+    isGameStart = true;
+        
+    scrollDisable();
+    canvasParant.style.display = 'block';
+    mainEl.style.display = 'none';
+    setInterval(MainGame, gameSpeed * 100);
+
+    canvas.width = mapX * 40 + 5;
+    canvas.height = mapY * 40 + 45;
+    snakeXPos = parseInt(mapX / 2);
+    snakeYPos = parseInt(mapY / 2);
+
+    ResetMap();
+
+    snakeRot = 3;
+    snakeList.push(snakeXPos + snakeYPos * mapX);
+}
+
+//if click main start button
 function ClickMainBtn(){
     mapX = document.getElementById("inputX").value;
     mapY = document.getElementById("inputY").value;
@@ -37,22 +72,7 @@ function ClickMainBtn(){
     if(mapX >= minMap && mapX <= maxMap &&
       mapY >= minMap && mapY <= maxMap &&
       gameSpeed >= minSpeed && gameSpeed <= maxSpeed){
-        isGameStart = true;
-        
-        scrollDisable();
-        canvasParant.style.display = 'block';
-        mainEl.style.display = 'none';
-        setInterval(MainGame, gameSpeed * 100);
-        
-        canvas.width = mapX * 40 + 5;
-        canvas.height = mapY * 40 + 45;
-        snakeXPos = parseInt(mapX / 2);
-        snakeYPos = parseInt(mapY / 2);
-        snakeYPos = 0;
-        
-        ResetMap();
-        
-        snakeRot = 3;
+        GameStartSetting();
     }
     else{
         canvasParant.style.display = 'none';
@@ -63,36 +83,63 @@ function ClickMainBtn(){
     }
 }
 
+//game frame iterator
 function MainGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    ResetMap();
+    Setitem();
     MoveSnake();
     AddMap();
 }
 
+//game over
 function GameOver(){
     
 }
 
+//snake moving way
 function MoveSnake(){
+    var afterNum = 0;
+    var beforeNum = 0;
+    var tmplist = [];
+    
+    tmplist = snakeList;
+    
 	if(snakeRot == 0){
  		--snakeYPos;
+        afterNum = 10;
     } else if (snakeRot == 1){
 		++snakeXPos;
+        afterNum = -1;
     } else if (snakeRot == 2){
 		++snakeYPos;
+        afterNum = -10;
     } else if (snakeRot == 3){
 		--snakeXPos;
+        afterNum = 1
+    }
+    beforeNum = afterNum * -1
+    
+    for(var i = 0; i < tmplist.length; i++){
+        map.splice(tmplist[i], 1, 0);
     }
     
-    ResetMap();
+    for(var i = 0; i < snakeList.length; i++){
+        if(map[snakeList[i] - afterNum] == 2){
+            snakeList.push(snakeList[i] + beforeNum);
+        }
+        
+        snakeList[i] -= afterNum ;
+        map.splice(snakeList[i], 1, 1);
+    }
+    console.log(snakeList);
+    console.log(snakeXPos + snakeYPos * mapX);
     
-    SetMap(snakeXPos, snakeYPos, 1);
-    Setitem();
 }
 
+//add frame(map)
 function AddMap(){ 
-    
     ctx.beginPath();
     
     for(var i = 0; i < mapY; i++){
@@ -113,37 +160,48 @@ function AddMap(){
     ctx.closePath();
 }
 
+//item produce way
 function Setitem(){
-    if(maxItem <= item0List.length){
-        return;
+    
+    if(itemTime > nowItemTime){
+    	nowItemTime++;
+    } else {
+        if(maxItem - 1 <= item0List.length){
+            var tmplist = [];
+            for(var i = 1; i < item0List.length; i++){
+                tmplist.push(item0List[i]);
+            }
+            item0List = [];
+            item0List = tmplist;
+    	}
+        nowItemTime = 0;
+        
+        var random = Math.random() * mapX * mapY;
+        item0List.push(random);
     }
-    var random = Math.random() * mapX * mapY;
     
     for(var i = 0; i < maxItem; i++){
-        map.splice(random, 1, 2);
+        	map.splice(item0List[i], 1, 2);
     }
 }
 
-function AddSnake(){
-    if(allsnake.length >= snakeLength){
-        return;
-    }
-    snakeLength++;
-}
-
+//set map value
 function SetMap(x, y, value){
     map.splice(x + y * mapX, 1, value);
 }
 
+//return map imfo
 function GetMap(x, y){
     return map[x + y * mapX];
 }
 
+//reset map
 function ResetMap(){
     map = new Array(mapX * mapY + 1);
     map.fill(0);
 }
 
+//take the key 
 window.addEventListener("keydown", e => {
   if(isGameStart){
       if(e.key == "ArrowUp"){
