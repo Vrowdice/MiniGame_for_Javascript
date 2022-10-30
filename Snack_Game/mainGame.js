@@ -21,6 +21,9 @@ var maxItem = 5;
 var gameTime = 0;
 var nowItemTime = 0;
 
+//game score
+var gameScore = 0;
+
 //snake imfo
 var snakeRot = 0;
 var snakeXPos = 0;
@@ -42,6 +45,7 @@ var isGameStart = false;
 //map array
 let item0List = [];
 let snakeList = [];
+let snakeLotList = [];
 let map = [];
 
 //game start main setting
@@ -55,6 +59,7 @@ function GameStartSetting(){
 
     canvas.width = mapX * 40 + 5;
     canvas.height = mapY * 40 + 45;
+    
     snakeXPos = parseInt(mapX / 2);
     snakeYPos = parseInt(mapY / 2);
 
@@ -92,6 +97,8 @@ function MainGame() {
     Setitem();
     MoveSnake();
     AddMap();
+    
+    gameScore += 1;
 }
 
 //game over
@@ -103,8 +110,6 @@ function GameOver(){
 function MoveSnake(){
     var afterNum = 0;
     var tmplist = [];
-    
-    tmplist = snakeList;
     
 	if(snakeRot == 0){
  		--snakeYPos;
@@ -120,30 +125,45 @@ function MoveSnake(){
         afterNum = 1
     }
     
-    for(var i = 0; i < tmplist.length; i++){
-        map.splice(tmplist[i], 1, 0);
-    }
+    tmplist = snakeList;
     
-    if(map[snakeList[snakelength] - afterNum] == 2){
-        snakeList.push(snakeList[snakelength] + afterNum);
-        snakelength++
-    }
-    
-    snakeList[0] -= afterNum;
     for(var i = 0; i < snakeList.length; i++){
-        if(i >= 1){
-            snakeList[i] -= tmplist;
-        }
+        map.splice(snakeList[i], 1, 0);
+    }
+    
+    tmplist.unshift(tmplist[0] -= afterNum);
+    tmplist.pop();
+    
+    for(var i = 0; i < snakeList.length; i++){
+ 		snakeList = tmplist
+    }
+   
+    if(map[snakeList[0]] == 2){
+        snakeList.push(snakeList[snakeList.length - 1] + afterNum);
+        gameScore += 100;
+    } else if (map[snakeList[0]] == 3){
+        gameScore += 200;
+    } else if (map[snakeList[0]] == 1){
+        GameOver();
+    }
+    
+    for(var i = 0; i < snakeList.length; i++){
         map.splice(snakeList[i], 1, 1);
     }
 }
 
 //add frame(map)
 function AddMap(){ 
+    SetMap(-1, 0, 3);
+    
     ctx.beginPath();
     
+    ctx.font = "italic bold 30px Arial, sans-serif"
+    ctx.fillStyle = "black";
+    ctx.fillText("Point :" + " " + gameScore, 20, 35, 200);
+    
     for(var i = 0; i < mapY; i++){
-    	for(var o = 0; o < mapX; o++){
+    	for(var o = -1; o < mapX; o++){
             ctx.fillRect(o * 40 + 5, i * 40 + 45, 35, 35);
             var mapCode = GetMap(o, i);
             
@@ -151,7 +171,9 @@ function AddMap(){
                 ctx.fillStyle = "black";
             } else if(mapCode == 2) {
                 ctx.fillStyle = "red";
-            } else {
+            } else if(mapCode == 3) {
+                ctx.fillStyle = "blue";
+            }else {
                 ctx.fillStyle = "#BBBBBB";
             }
     	}
@@ -181,18 +203,18 @@ function Setitem(){
     }
     
     for(var i = 0; i < maxItem; i++){
-        	map.splice(item0List[i], 1, 2);
+        map.splice(item0List[i], 1, 2);
     }
 }
 
 //set map value
 function SetMap(x, y, value){
-    map.splice(x + y * mapX, 1, value);
+    map.splice(x + y * mapX + 1, 1, value);
 }
 
 //return map imfo
 function GetMap(x, y){
-    return map[x + y * mapX];
+    return map[x + y * mapX + 1];
 }
 
 //reset map
