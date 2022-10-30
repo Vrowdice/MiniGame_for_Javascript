@@ -103,6 +103,7 @@ function MainGame() {
 
 //game over
 function GameOver(){
+    isGameStart = false;
     
 }
 
@@ -227,12 +228,24 @@ function ResetMap(){
 window.addEventListener("keydown", e => {
   if(isGameStart){
       if(e.key == "ArrowUp"){
+          if(snakeRot == 2){
+              return;
+          }
           snakeRot = 0;
       } else if (e.key == "ArrowRight"){
+          if(snakeRot == 3){
+              return;
+          }
           snakeRot = 1;
       } else if (e.key == "ArrowDown"){
+          if(snakeRot == 0){
+              return;
+          }
           snakeRot = 2;
       } else if (e.key == "ArrowLeft"){
+          if(snakeRot == 1){
+              return;
+          }
           snakeRot = 3;
       }
   }
