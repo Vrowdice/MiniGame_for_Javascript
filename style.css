@@ -13,12 +13,20 @@
     min-height:100%;
     overflow:hidden !important;
 }
-.button {
+.startBtn {
     background-color: black;
     color: white;
     height: 90px;
     width: 200px;
     font-size: 50px;
+    border-radius: 10px;
+}
+.gameBtn {
+    background-color: white;
+    color: black;
+    height: 50px;
+    width: 200px;
+    font-size: 20px;
     border-radius: 10px;
 }
 .input{
