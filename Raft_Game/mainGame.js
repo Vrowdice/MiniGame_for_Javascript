@@ -108,13 +108,13 @@ function MoveSnake(){
     
 	if(snakeRot == 0){
  		--snakeYPos;
-        afterNum = 10;
+        afterNum = mapY;
     } else if (snakeRot == 1){
 		++snakeXPos;
         afterNum = -1;
     } else if (snakeRot == 2){
 		++snakeYPos;
-        afterNum = -10;
+        afterNum = -mapY;
     } else if (snakeRot == 3){
 		--snakeXPos;
         afterNum = 1
@@ -159,37 +159,16 @@ function AddMap(){
 
 //item produce way
 function Setitem(){
-    
-    if(itemTime > nowItemTime){
-    	nowItemTime++;
-    } else {
-        if(maxItem - 1 <= item0List.length){
-            var tmplist = [];
-            for(var i = 1; i < item0List.length; i++){
-                tmplist.push(item0List[i]);
-            }
-            item0List = [];
-            item0List = tmplist;
-    	}
-        nowItemTime = 0;
-        
-        var random = Math.random() * mapX * mapY;
-        item0List.push(random);
-    }
-    
-    for(var i = 0; i < maxItem; i++){
-        	map.splice(item0List[i], 1, 2);
-    }
 }
 
 //set map value
 function SetMap(x, y, value){
-    map.splice(x + y * mapX, 1, value);
+    map.splice(x + y * mapX + 1, 1, value);
 }
 
 //return map imfo
 function GetMap(x, y){
-    return map[x + y * mapX];
+    return map[x + y * mapX + 1];
 }
 
 //reset map
