@@ -37,9 +37,11 @@ var gameSpeed = 0;
 var isGameStart = false;
 
 //item0 array,
+//item1 array,
 //snake body array,
 //map array
 let item0List = [];
+let item1List = [];
 let snakeList = [];
 let map = [];
 
@@ -95,7 +97,12 @@ function MainGame() {
 
 //game over
 function GameOver(){
+    isGameStart = false;
     
+    clearInterval(interVal);
+    
+    canvasParant.style.display = 'none';
+    mainEl.style.display = 'block';
 }
 
 //snake moving way
@@ -148,8 +155,10 @@ function AddMap(){
                 ctx.fillStyle = "black";
             } else if(mapCode == 2) {
                 ctx.fillStyle = "red";
+            } else if(mapCode == 3){
+                ctx.fillStyle = "blue";
             } else {
-                ctx.fillStyle = "#BBBBBB";
+               ctx.fillStyle = "#BBBBBB"; 
             }
     	}
     }
@@ -159,6 +168,34 @@ function AddMap(){
 
 //item produce way
 function Setitem(){
+    if(itemTime > nowItemTime){
+    	nowItemTime++;
+    } else {
+        var random = Math.random() * mapX;
+        item0List.push(parseInt(random) - mapY);
+        random = Math.random() * mapX;
+        item1List.push(parseInt(random) - mapY);
+        console.log(item0List);
+        nowItemTime = 0;
+    }
+    
+    for(var i = 0; i < item0List.length; i++){
+        item0List[i] += parseInt(mapY);
+        map.splice(item0List[i], 1, 2);
+    }
+    if(item0List[0] > mapY * mapX){
+        item0List.shift();
+    }
+    
+    for(var i = 0; i < item1List.length; i++){
+        item1List[i] += parseInt(mapY);
+        map.splice(item0List[i], 1, 3);
+    }
+    if(item1List[0] > mapY * mapX){
+        item1List.shift();
+    }
+    
+    console.log(item0List);
 }
 
 //set map value
