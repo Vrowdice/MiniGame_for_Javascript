@@ -1,3 +1,4 @@
+//get element
 const mainEl = document.getElementById("mainEl");
 const canvasParant = document.getElementById("canvasParant")
 const canvas = document.getElementById("canvas");
@@ -21,10 +22,14 @@ var maxItem = 5;
 var gameTime = 0;
 var nowItemTime = 0;
 
+//game score
+var gameScore = 0;
+
 //snake imfo
 var snakeRot = 0;
 var snakeXPos = 0;
 var snakeYPos = 0;
+var snakeLastRot = 0;
 
 //now snake position
 var mapX = 0;
@@ -32,6 +37,9 @@ var mapY = 0;
 
 //now game speed
 var gameSpeed = 0;
+
+//interval func
+var interVal;
 
 //game start flag
 var isGameStart = false;
@@ -47,13 +55,26 @@ let map = [];
 function GameStartSetting(){
     isGameStart = true;
         
-    scrollDisable();
+    gameTime = 0;
+    nowItemTime = 0;
+    gameScore = 0;
+    
+    snakeRot = 0;
+    snakeXPos = 0;
+    snakeYPos = 0;
+    
+    item0List = [];
+    snakeList = [];
+    map = [];
+    
     canvasParant.style.display = 'block';
     mainEl.style.display = 'none';
-    setInterval(MainGame, gameSpeed * 100);
+    interVal = setInterval(MainGame, gameSpeed * 100);
+    secInterVal = setInterval(Sec, 1000);
 
     canvas.width = mapX * 40 + 5;
     canvas.height = mapY * 40 + 45;
+    
     snakeXPos = parseInt(mapX / 2);
     snakeYPos = parseInt(mapY / 2);
 
@@ -91,20 +112,28 @@ function MainGame() {
     Setitem();
     MoveSnake();
     AddMap();
+    
+    gameScore++;
+}
+
+function Sec(){
+    gameTime++;
 }
 
 //game over
 function GameOver(){
+    isGameStart = false;
     
+    clearInterval(interVal);
+    
+    canvasParant.style.display = 'none';
+    mainEl.style.display = 'block';
 }
 
 //snake moving way
 function MoveSnake(){
     var afterNum = 0;
-    var beforeNum = 0;
     var tmplist = [];
-    
-    tmplist = snakeList;
     
 	if(snakeRot == 0){
  		--snakeYPos;
@@ -119,28 +148,60 @@ function MoveSnake(){
 		--snakeXPos;
         afterNum = 1
     }
-    beforeNum = afterNum * -1
     
-    for(var i = 0; i < tmplist.length; i++){
-        map.splice(tmplist[i], 1, 0);
+    if(snakeXPos < 0 || snakeYPos < 0 ||
+      snakeXPos >= mapX || snakeYPos >= mapY){
+        GameOver();
     }
     
     for(var i = 0; i < snakeList.length; i++){
-        if(map[snakeList[i] - afterNum] == 2){
-            snakeList.push(snakeList[i] + beforeNum);
+        map.splice(snakeList[i], 1, 0);
+    }
+    
+    tmplist = snakeList;
+    tmplist.unshift(tmplist[0] - afterNum);
+    tmplist.pop();
+    snakeList = tmplist;
+    
+    console.log(snakeList);
+    
+    for(var i = 2; i < snakeList.length; i++){
+        if(snakeList[0] == snakeList[i]){
+            GameOver();
         }
+    } 
+   
+    if(map[snakeList[0]] == 2){
+        var rot = snakeList[snakeList.length - 2] - snakeList[snakeList.length - 1];
+    	afterNum = rot
         
-        snakeList[i] -= afterNum ;
+        snakeList.push(snakeList[snakeList.length - 1] + afterNum);
+        gameScore += 100;
+    } else if (map[snakeList[0]] == 3){
+        gameScore += 200;
+    }
+    
+    for(var i = 0; i < snakeList.length; i++){
         map.splice(snakeList[i], 1, 1);
     }
 }
 
 //add frame(map)
 function AddMap(){ 
+    SetMap(-1, 0, 3);
+    
     ctx.beginPath();
     
+    ctx.font = "italic bold 30px Arial, sans-serif"
+    ctx.fillStyle = "black";
+    ctx.fillText("Point :" + " " + gameScore, 20, 35, 200);
+    
+	ctx.font = "italic bold 20px Arial, sans-serif"
+    ctx.fillStyle = "black";
+    ctx.fillText("Time :" + " " + gameTime, 300, 35, 200);
+    
     for(var i = 0; i < mapY; i++){
-    	for(var o = 0; o < mapX; o++){
+    	for(var o = -1; o < mapX; o++){
             ctx.fillRect(o * 40 + 5, i * 40 + 45, 35, 35);
             var mapCode = GetMap(o, i);
             
@@ -148,7 +209,9 @@ function AddMap(){
                 ctx.fillStyle = "black";
             } else if(mapCode == 2) {
                 ctx.fillStyle = "red";
-            } else {
+            } else if(mapCode == 3) {
+                ctx.fillStyle = "blue";
+            }else {
                 ctx.fillStyle = "#BBBBBB";
             }
     	}
@@ -159,6 +222,27 @@ function AddMap(){
 
 //item produce way
 function Setitem(){
+    
+    if(itemTime > nowItemTime){
+    	nowItemTime++;
+    } else {
+        if(maxItem <= item0List.length){
+            var tmplist = [];
+            for(var i = 1; i < item0List.length; i++){
+                tmplist.push(item0List[i]);
+            }
+            item0List = [];
+            item0List = tmplist;
+    	}
+        nowItemTime = 0;
+        
+        var random = Math.random() * mapX * mapY;
+        item0List.push(random);
+    }
+    
+    for(var i = 0; i < maxItem + 1; i++){
+        map.splice(item0List[i], 1, 2);
+    }
 }
 
 //set map value
@@ -191,11 +275,3 @@ window.addEventListener("keydown", e => {
       }
   }
 });
-
-function scrollDisable(){
-    document.getElementById("body").classname = "hidden"
-}
-
-function scrollAble(){
-    document.getElementById("body").classname = "body"
-}
