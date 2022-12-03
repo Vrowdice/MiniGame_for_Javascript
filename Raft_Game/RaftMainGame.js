@@ -41,11 +41,12 @@ var isMove = false;
 
 //item array,
 //snake body array,
-//map array
+//mapX array
+//mapY array
+//map Value
 let itemList = [];
 let raftList  = [];
-let mapX = [];
-let mapY = [];
+let map = [];
 
 //game start main setting
 function GameStartSetting(){
@@ -112,22 +113,44 @@ function GameOver(){
 function MoveSnake(){
     var afterNum = 0;
     var beforeNum = 0;
+    var tmplist = [];
     
-    if(isMove){
+    if(!isMove){
+        tmplist = raftList;
+    
         if(snakeRot == 0){
- 		--snakeYPos;
+            --snakeYPos;
+            afterNum = maxMapY;
         } else if (snakeRot == 1){
             ++snakeXPos;
+            afterNum = -1;
         } else if (snakeRot == 2){
             ++snakeYPos;
+            afterNum = -maxMapY;
         } else if (snakeRot == 3){
             --snakeXPos;
+            afterNum = 1
         }
-        
-        isMove = true;
+        beforeNum = afterNum * -1
+
+        for(var i = 0; i < tmplist.length; i++){
+            map.splice(tmplist[i], 1, 0);
+        }
+
+        for(var i = 0; i < raftList.length; i++){
+            if(map[raftList[i] - afterNum] == 2){
+                raftList.push(raftList[i] + beforeNum);
+            }
+
+            raftList[i] -= afterNum ;
+        }
     }
     
-	SetMap(snakeXPos, snakeYPos, 1);
+    for(var i = 0; i < raftList.length; i++){
+        map.splice(raftList[i], 1, 1);
+    }
+    
+    isMove = true;
 }
 
 //add frame(map)
@@ -160,16 +183,19 @@ function Setitem(){
     	nowItemTime++;
     } else {
         var random = Math.random() * maxMapX;
-        itemList.push(parseInt(random));
+        itemList.push(parseInt(random) - maxMapY);
         nowItemTime = 0;
     }
     
     for(var i = 0; i < itemList.length; i++){
-        SetMap(itemList[i], 0, 2);
+        itemList[i] += parseInt(maxMapY);
+        map[itemList[i]] = 2;
     }
     if(itemList[0] > maxMapY * maxMapX){
         itemList.shift();
     }
+    
+    console.log(itemList);
 }
 
 //set map value
@@ -177,7 +203,6 @@ function SetMap(x, y, value){
     if(x <= -1 || x > maxMapX || y <= -1 || y > maxMapY){
         return;
     }
-    console.log(x + " " + y + " " + value);
     map[x + y * maxMapX + 1] = value;
 }
 
