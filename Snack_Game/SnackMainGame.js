@@ -163,8 +163,6 @@ function MoveSnake(){
     tmplist.pop();
     snakeList = tmplist;
     
-    console.log(snakeList);
-    
     for(var i = 2; i < snakeList.length; i++){
         if(snakeList[0] == snakeList[i]){
             GameOver();
