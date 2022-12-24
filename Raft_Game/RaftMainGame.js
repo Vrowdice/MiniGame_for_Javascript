@@ -1,5 +1,3 @@
-// 12/19 그냥 객체 한번 다시 써보자
-
 const mainEl = document.getElementById("mainEl");
 const canvasParant = document.getElementById("canvasParant")
 const canvas = document.getElementById("canvas");
@@ -13,22 +11,24 @@ const minMap = 5;
 const maxSpeed = 10;
 const minSpeed = 0.1
 
-//the time the item exists
-const item0Time = 8;
-const item1Time = 10;
+//produce item time
+var item0Time = 1;
+var item1Time = 15;
 
 //max item
 var maxItem = 5;
 
-//game time and now item exists time
+//game time and scroe, now item exists time
 var gameTime = 0;
+var gameScore = 0;
 var nowItem0Time = 0;
 var nowItem1Time = 0;
 
-//snake imfo
-var snakeRot = 0;
-var snakeXPos = 0;
-var snakeYPos = 0;
+//if raft block is one, count second
+var countSec = 0;
+
+//to go imfo
+var raftRot = 0;
 
 //now snake position
 var maxMapX = 0;
@@ -63,17 +63,17 @@ function GameStartSetting(){
     mainEl.style.display = 'none';
 
     canvas.width = maxMapX * 40 + 5;
-    canvas.height = maxMapY * 40 + 45;
+    canvas.height = maxMapY * 40 + 70;
     
     snakeXPos = parseInt(maxMapX / 2);
     snakeYPos = parseInt(maxMapY / 2);
     
     ResetMap();
 
-    snakeRot = 3;
-    raftList .push(snakeXPos + snakeYPos * maxMapX);
+    raftRot = 3;
+    raftList.push(snakeXPos + snakeYPos * maxMapX);
     
-    setInterval(MainGame, gameSpeed * 100);
+    interVal = setInterval(MainGame, gameSpeed * 100);
 }
 
 //if click main start button
@@ -102,40 +102,45 @@ function MainGame() {
     
     ResetMap();
     Setitem();
-    MoveSnake();
+    MoveRaft();
     AddMap();
+    Condition();
+    
+    gameTime++;
+    gameScore++;
+    
+    console.log(raftList);
 }
 
 //game over
 function GameOver(){
     isGameStart = false;
-    
     clearInterval(interVal);
+    
+    ResetAll();
     
     canvasParant.style.display = 'none';
     mainEl.style.display = 'block';
 }
 
 //move snake
-function MoveSnake(){
+function MoveRaft(){
     var afterNum = 0;
     var beforeNum = 0;
     var tmplist = [];
     
     if(!isMove){
+        gameScore += 10;
+        
         tmplist = raftList;
     
-        if(snakeRot == 0){
-            --snakeYPos;
+        if(raftRot == 0){
             afterNum = maxMapY;
-        } else if (snakeRot == 1){
-            ++snakeXPos;
+        } else if (raftRot == 1){
             afterNum = -1;
-        } else if (snakeRot == 2){
-            ++snakeYPos;
+        } else if (raftRot == 2){
             afterNum = -maxMapY;
-        } else if (snakeRot == 3){
-            --snakeXPos;
+        } else if (raftRot == 3){
             afterNum = 1
         }
         beforeNum = afterNum * -1
@@ -145,15 +150,25 @@ function MoveSnake(){
                 raftList.push(raftList[i] + beforeNum);
                 const found = itemList0.findIndex(element => element == raftList[i] + beforeNum);
                 itemList0.splice(found, 1);
+                gameScore += 200;
             } 
             if(map[raftList[i] - afterNum] == 3){
                 raftList.splice(i, 1);
                 const found = itemList1.findIndex(element => element == raftList[i] + beforeNum);
                 itemList1.splice(found, 1);
+                gameScore += 200;
             }
-
+            if(raftRot == 1 || 3){
+                if(raftList[i] % maxMapX == 0){
+                    return;
+                } else if(raftList[i] % maxMapX == maxMapX - 1){
+                    return;
+                }
+            }
+        }
+        
+        for(var i = 0; i < raftList.length; i++){
             raftList[i] -= afterNum ;
-            map.splice(raftList[i], 1, 1);
         }
     }
     
@@ -170,16 +185,22 @@ function AddMap(){
     
     ctx.font = "italic bold 30px Arial, sans-serif"
     ctx.fillStyle = "black";
-    ctx.fillText("Point :" + " ", 20, 35, 200);
+    ctx.fillText("Point :" + " " + gameScore, 20, 35, 200);
     
 	ctx.font = "italic bold 20px Arial, sans-serif"
     ctx.fillStyle = "black";
-    ctx.fillText("Time :" + " ", 300, 35, 200);
+    ctx.fillText("Time :" + " " + gameTime, 300, 35, 200);
     
+    ctx.font = "italic bold 20px Arial, sans-serif"
+    ctx.fillStyle = "black";
+    ctx.fillText("Count Down :" + " " + countSec, 20, 60, 200);
+    
+    ctx.fillRect(0 * 40 + 5, 0 * 40 + 70, 35, 35);
+    ctx.fillStyle = "#BBBBBB";
     
     for(var i = 0; i < maxMapY; i++){
     	for(var o = 0; o < maxMapX; o++){
-            ctx.fillRect(o * 40 + 5, i * 40 + 45, 35, 35);
+            ctx.fillRect(o * 40 + 5, i * 40 + 70, 35, 35);
             var mapCode = GetMap(o, i);
             
             if(mapCode == 1){
@@ -201,6 +222,7 @@ function AddMap(){
 function Setitem(){
     if(item0Time > nowItem0Time){
     	nowItem0Time++;
+        item0Time += 0.05;
     } else {
         var random = Math.random() * maxMapX;
         itemList0.push(parseInt(random) - maxMapY);
@@ -209,6 +231,7 @@ function Setitem(){
     
     if(item1Time > nowItem1Time){
     	nowItem1Time++;
+        item1Time -= 0.1;
     } else {
         var random = Math.random() * maxMapX;
         itemList1.push(parseInt(random) - maxMapY);
@@ -223,7 +246,7 @@ function Setitem(){
             if(raftList[o] == itemList0[i]){
                 raftList.push(raftList[o] - parseInt(maxMapX));
             	itemList0.splice(i, 1);
-                break;
+                gameScore += 100;
             }
         }
     }
@@ -236,7 +259,7 @@ function Setitem(){
             if(raftList[o] == itemList1[i]){
                 raftList.splice(o, 1);
             	itemList1.splice(i, 1);
-                break;
+                gameScore += 100;
             }
         }
     }
@@ -246,6 +269,24 @@ function Setitem(){
     }
     if(itemList1[0] > maxMapY * maxMapX){
         itemList1.shift();
+    }
+}
+
+function Condition(){
+    if(raftList.length <= 0){
+        GameOver();
+    }
+    
+    if(gameTime <= 30){
+        return;
+    }
+       
+    if(countSec >= 30){
+        GameOver();
+    }
+    
+    if(raftList.length <= 1){
+        countSec++;
     }
 }
 
@@ -280,26 +321,43 @@ function GetMap(x, y){
 
 //reset map
 function ResetMap(){
-    beforeMap = new Array(maxMapX * maxMapY + 1);
+    beforeMap = new Array(maxMapX * maxMapY);
     beforeMap = map;
-    map = new Array(maxMapX * maxMapY + 1);
+    map = new Array(maxMapX * maxMapY);
     map.fill(0);
+}
+
+function ResetAll(){
+    ResetMap();
+    beforeMap = new Array(maxMapX * maxMapY);
+    
+    gameScore = 0;
+    gameTime = 0;
+    countSec = 0;
+    item0Time = 1;
+    item1Time = 15;
+    
+    itemList0 = [];
+    itemList1 = [];
+    raftList = [];
+    
+    raftList.push(snakeXPos + snakeYPos * maxMapX);
 }
 
 //take the key 
 window.addEventListener("keydown", e => {
   if(isGameStart){
       if(e.key == "ArrowUp"){
-          snakeRot = 0;
+          raftRot = 0;
           isMove = false;
       } else if (e.key == "ArrowRight"){
-          snakeRot = 1;
+          raftRot = 1;
           isMove = false;
       } else if (e.key == "ArrowDown"){
-          snakeRot = 2;
+          raftRot = 2;
           isMove = false;
       } else if (e.key == "ArrowLeft"){
-          snakeRot = 3;
+          raftRot = 3;
           isMove = false;
       }
   }
