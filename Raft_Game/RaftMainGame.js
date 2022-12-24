@@ -108,8 +108,6 @@ function MainGame() {
     
     gameTime++;
     gameScore++;
-    
-    console.log(raftList);
 }
 
 //game over
@@ -130,6 +128,8 @@ function MoveRaft(){
     var tmplist = [];
     
     if(!isMove){
+        console.log(raftList);
+        
         gameScore += 10;
         
         tmplist = raftList;
@@ -158,10 +158,15 @@ function MoveRaft(){
                 itemList1.splice(found, 1);
                 gameScore += 200;
             }
-            if(raftRot == 1 || 3){
-                if(raftList[i] % maxMapX == 0){
+            
+            if(raftRot == 3){
+                if(parseInt(raftList[i]) % maxMapX == 0){
+                    isMove = true;
                     return;
-                } else if(raftList[i] % maxMapX == maxMapX - 1){
+                } 
+            } else if(raftRot == 1){
+                if(parseInt(raftList[i]) % maxMapX == maxMapX - 1){
+                    isMove = true;
                     return;
                 }
             }
@@ -221,7 +226,7 @@ function AddMap(){
 //item produce way
 function Setitem(){
     if(item0Time > nowItem0Time){
-    	nowItem0Time++;
+    	//nowItem0Time++;
         item0Time += 0.05;
     } else {
         var random = Math.random() * maxMapX;
@@ -230,7 +235,7 @@ function Setitem(){
     }
     
     if(item1Time > nowItem1Time){
-    	nowItem1Time++;
+    	//nowItem1Time++;
         item1Time -= 0.1;
     } else {
         var random = Math.random() * maxMapX;
@@ -321,9 +326,9 @@ function GetMap(x, y){
 
 //reset map
 function ResetMap(){
-    beforeMap = new Array(maxMapX * maxMapY);
+    beforeMap = new Array(maxMapX * maxMapY + 1);
     beforeMap = map;
-    map = new Array(maxMapX * maxMapY);
+    map = new Array(maxMapX * maxMapY + 1);
     map.fill(0);
 }
 
@@ -369,10 +374,4 @@ function scrollDisable(){
 
 function scrollAble(){
     document.getElementById("body").classname = "body"
-}
-
-function IsExist(element)  {
-  if(element == 2)  {
-    return true;
-  }
 }
